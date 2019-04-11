@@ -61,7 +61,7 @@ func main() {
 				fcflags = true
 			} else if arg == "--libs" {
 				flibs = true
-			} else {
+			} else if arg != "--" {
 				println("invalid argument:", arg)
 				os.Exit(2)
 			}
