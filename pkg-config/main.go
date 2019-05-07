@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -16,14 +16,13 @@ func flags(root, pkg, name string) string {
 		return ""
 	}
 	defer f.Close()
-	b, e := ioutil.ReadAll(f)
-	if e != nil {
-		println(e.Error())
-		return ""
-	}
+
+	scanner := bufio.NewScanner(f)
 	re := regexp.MustCompile(`^(\w+)=(.*)$`)
 	vv := make(map[string]string)
-	for _, l := range strings.Split(string(b), "\n") {
+
+	for scanner.Scan() {
+		l := scanner.Text()
 		m := re.FindStringSubmatch(l)
 		if m != nil && len(m) == 3 {
 			key, val := m[1], m[2]
@@ -40,6 +39,10 @@ func flags(root, pkg, name string) string {
 			}
 			return val
 		}
+	}
+	if scanner.Err() != nil {
+		println(scanner.Err().Error())
+		return ""
 	}
 	return ""
 }
